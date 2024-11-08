@@ -1,7 +1,7 @@
 package com.koreait.surl_project_11.global.initData;
 
 import com.koreait.surl_project_11.domain.article.article.entity.Article;
-import com.koreait.surl_project_11.domain.article.article.repository.ArticleRepository;
+import com.koreait.surl_project_11.domain.article.article.service.ArticleService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ public class NotProd {
     // @Lazy, @Autowired 조합은 this의 외부 호출 모드 버전 self를 얻을 수 있다.
     // 따라서 self를 통한 메서드 호출은 @Transactional을 작동시킬 수 있다.
 
-    public final ArticleRepository articleRepository;
+    public final ArticleService articleService;
 
     @Bean   // 스프링부트에 등록: 개발자가 new 하지 않아도 스프링부트가 직접 관리하는 객체(실행될 때 자동 생성)
     public ApplicationRunner initNotProd() {
@@ -39,26 +38,14 @@ public class NotProd {
 
     @Transactional
     public void work1() {
-        if (articleRepository.count() > 0) return;  //(articleRepository.count() > 0) : select
+        if (articleService.count() > 0) return;  //(articleRepository.count() > 0) : select
 
-        //articleRepository.deleteAll();
-
-        Article article1 = Article.builder()
-                .createDate(LocalDateTime.now())
-                .title("제목1")
-                .body("내용1").build();
-
-        Article article2 = Article.builder()
-                .title("제목2")
-                .body("내용2").build();
-
-
-        articleRepository.save(article1);   // insert
-        articleRepository.save(article2);
+        Article article1 = articleService.write("제목 1", "내용 1");
+        Article article2 = articleService.write("제목 2", "내용 2");
 
         article2.setTitle("제목 2-2");    // update
 
-        articleRepository.delete(article1); // delete
+        articleService.delete(article1); // delete
     }
 
     @Transactional
@@ -66,13 +53,9 @@ public class NotProd {
         // select
         // List : 값을 0 ~ N 개 넣을 수 있음
         // Optional : 값을 0 ~ 1 개 넣을 수 있음
-        Optional<Article> opArticle = articleRepository.findById(2L);   // JpaRepository 기본 제공
+        Optional<Article> opArticle = articleService.findById(2L);   // JpaRepository 기본 제공
 
-        List<Article> articles = articleRepository.findAll();   // JpaRepository 기본 제공
-
-        List<Article> articlesByIn = articleRepository.findByIdInOrderByTitleDescIdAsc(List.of(1L, 2L));
-        articleRepository.findByTitleContaining("제목");
-        articleRepository.findByTitleAndBody("제목", "내용");
+        List<Article> articles = articleService.findAll();   // JpaRepository 기본 제공
 
     }
 }

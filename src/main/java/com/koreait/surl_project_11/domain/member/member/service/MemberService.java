@@ -2,6 +2,7 @@ package com.koreait.surl_project_11.domain.member.member.service;
 
 import com.koreait.surl_project_11.domain.member.member.entity.Member;
 import com.koreait.surl_project_11.domain.member.member.repository.MemberRepository;
+import com.koreait.surl_project_11.global.exceptions.GlobalException;
 import com.koreait.surl_project_11.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,21 @@ public class MemberService {
 
     public RsData<Member> join(String username, String password, String nickname) {
         boolean present = findByUsername(username).isPresent();
-        if (present) {
-            return RsData.of("400-1", "이미 존재하는 아이디입니다.", Member.builder().build());
-        }
+
+        // 중복체크 표현 여러가지 방법들
+//        if (present) {
+//            // runtime Exception 계열
+//            // 아래처럼 이미 있는 애인 IllegalArgumentException 을 써도 되고 ..
+////            throw new IllegalArgumentException("이미 존재하는 아이디야");
+//            // 아래처럼 내가 원하는 Exception 을 만들어서 쓸 수도 있다.
+//            throw new GlobalException("400-1", "이미 존재하는 아이디야");
+//        }
+
+        // 이런 식으로 작성해도 된다.
+        findByUsername(username).ifPresent(ignored -> {
+            throw new GlobalException("400-1", "이미 존재하는 아이디야");
+        });
+
         Member member = Member.builder()
                 .username(username)
                 .password(password)

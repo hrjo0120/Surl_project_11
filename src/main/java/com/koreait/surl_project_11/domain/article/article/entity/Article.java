@@ -4,14 +4,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity // 이 클래스로 테이블 만들거야
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Article {
 
     @Id // 이 필드를 PRIMARY KEY로 만들거야

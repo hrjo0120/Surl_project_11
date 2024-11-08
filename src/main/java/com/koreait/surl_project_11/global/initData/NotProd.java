@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ import java.util.Optional;
 public class NotProd {
     @Lazy
     @Autowired
-    private  NotProd self;
+    private NotProd self;
     // this를 통한 객체 내부에서의 메서드 호출은 @Transactional을 작동시키지 않고
     // 외부 객체에 의한 메서드 호출은 @Transactional이 작동한다.
     // @Lazy, @Autowired 조합은 this의 외부 호출 모드 버전 self를 얻을 수 있다.
@@ -40,23 +41,24 @@ public class NotProd {
     public void work1() {
         if (articleRepository.count() > 0) return;  //(articleRepository.count() > 0) : select
 
-                //articleRepository.deleteAll();
+        //articleRepository.deleteAll();
 
-                Article article1 = Article.builder().
-                        title("제목1")
-                        .body("내용1").build();
+        Article article1 = Article.builder()
+                .createDate(LocalDateTime.now())
+                .title("제목1")
+                .body("내용1").build();
 
-                Article article2 = Article.builder().
-                        title("제목2")
-                        .body("내용2").build();
+        Article article2 = Article.builder()
+                .title("제목2")
+                .body("내용2").build();
 
 
-                articleRepository.save(article1);   // insert
-                articleRepository.save(article2);
+        articleRepository.save(article1);   // insert
+        articleRepository.save(article2);
 
-                article2.setTitle("제목 2-2");    // update
+        article2.setTitle("제목 2-2");    // update
 
-                articleRepository.delete(article1); // delete
+        articleRepository.delete(article1); // delete
     }
 
     @Transactional

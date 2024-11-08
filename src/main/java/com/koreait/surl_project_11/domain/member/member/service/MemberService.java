@@ -6,18 +6,26 @@ import com.koreait.surl_project_11.global.exceptions.GlobalException;
 import com.koreait.surl_project_11.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public RsData<Member> join(String username, String password, String nickname) {
-        boolean present = findByUsername(username).isPresent();
+    private Optional<Member> findByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
 
-        // 중복체크 표현 여러가지 방법들
+    @Transactional  // @Transactional 붙이는 것이 관례
+    // @Transactional(noRollbackFor = GlobalException.class)
+    public RsData<Member> join(String username, String password, String nickname) {
+//        boolean present = findByUsername(username).isPresent();
+
+//        // 중복체크 표현 여러가지 방법들
 //        if (present) {
 //            // runtime Exception 계열
 //            // 아래처럼 이미 있는 애인 IllegalArgumentException 을 써도 되고 ..
@@ -38,9 +46,5 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
         return RsData.of("회원가입이 완료되었습니다.", member);
-    }
-
-    private Optional<Member> findByUsername(String username) {
-        return memberRepository.findByUsername(username);
     }
 }

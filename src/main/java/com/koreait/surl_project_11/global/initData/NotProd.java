@@ -13,9 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
-import java.util.List;
-import java.util.Optional;
-
 @Profile("!prod")   // !prod == dev or test , 운영모드가 아닐 때 실행됨
 @Configuration
 @RequiredArgsConstructor
@@ -35,7 +32,6 @@ public class NotProd {
     public ApplicationRunner initNotProd() {
         return args -> {
             self.work1();
-            self.work2();
         };
     }
 
@@ -43,8 +39,13 @@ public class NotProd {
     public void work1() {
         if (articleService.count() > 0) return;  //(articleRepository.count() > 0) : select
 
-        Member member1 = memberService.join("user1", "1234", "유저 1").getData();
-        Member member2 = memberService.join("user2", "1234", "유저 2").getData();
+        // All 에서 실행되기 때문에 NotProd 에서 실행될 필요가 없다.
+//        Member member1 = memberService.join("user1", "1234", "유저 1").getData();
+//        Member member2 = memberService.join("user2", "1234", "유저 2").getData();
+
+        // 멤버는 All 측에서 만든 것을 가져오고, 여기서는 만들 지 않는다.
+        Member memberUser1 = memberService.findByUsername("user1").get();
+        Member memberUser2 = memberService.findByUsername("user2").get();
 
 
 //        try {
@@ -54,24 +55,10 @@ public class NotProd {
 //            System.out.println("e.getStatusCode() : " + e.getRsData().getStatusCode());
 //        }
 
-        Article article1 = articleService.write(member1, "제목 1", "내용 1").getData();
-        Article article2 = articleService.write(member1, "제목 2", "내용 2").getData();
+        Article article1 = articleService.write(memberUser1, "제목 1", "내용 1").getData();
+        Article article2 = articleService.write(memberUser1, "제목 2", "내용 2").getData();
 
-        Article article3 = articleService.write(member2, "제목 3", "내용 3").getData();
-        Article article4 = articleService.write(member2, "제목 4", "내용 4").getData();
-
-        article2.setTitle("제목 2-2");    // update
-
-        articleService.delete(article1); // delete
-    }
-
-    @Transactional
-    public void work2() {
-        // select
-        // List : 값을 0 ~ N 개 넣을 수 있음
-        // Optional : 값을 0 ~ 1 개 넣을 수 있음
-        Optional<Article> opArticle = articleService.findById(2L);   // JpaRepository 기본 제공
-
-        List<Article> articles = articleService.findAll();   // JpaRepository 기본 제공
+        Article article3 = articleService.write(memberUser2, "제목 3", "내용 3").getData();
+        Article article4 = articleService.write(memberUser2, "제목 4", "내용 4").getData();
     }
 }

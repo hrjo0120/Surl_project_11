@@ -17,11 +17,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GlobalException.class)
     //@ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<String> handleException(GlobalException ex) {
+    // 에러를 표현할 때 데이터를 담을 필요가 없기 때문에, 메시지와 상태코드만 담는 다
+    public ResponseEntity<RsData<Empty>> handleException(GlobalException ex) {
+
+        log.debug("handleException started!");
+
         RsData<Empty> rsData = ex.getRsData();
 
         rsData.getStatusCode();
 
-        return ResponseEntity.status(rsData.getStatusCode()).body(rsData.getMsg());
+        return ResponseEntity
+                .status(rsData.getStatusCode())
+                .body(rsData);
     }
 }

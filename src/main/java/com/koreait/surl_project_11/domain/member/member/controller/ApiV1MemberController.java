@@ -32,17 +32,23 @@ public class ApiV1MemberController {
         private String nickname;
     }
 
+    @AllArgsConstructor
+    @Getter
+    public static class MemberJoinRespBody {
+        Member item;
+    }
+
+    // 엔드포인트 액션메소드
     // POST /api/v1/members
     @PostMapping("")
-    public RsData<Member> join(
+    public RsData<MemberJoinRespBody> join(
             @RequestBody @Valid MemberJoinReqBody requestBody
     ) {
-        
-        int a = 40;
-        int b = 0;
-        int c = a / b;
-        
-        return memberService.join(requestBody.username, requestBody.password, requestBody.nickname);
+        RsData<Member> joinRs = memberService.join(requestBody.username, requestBody.password, requestBody.nickname);
+
+        return joinRs.newDataOf(
+                new MemberJoinRespBody(joinRs.getData())
+        );
     }
 
 }

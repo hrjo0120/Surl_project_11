@@ -37,7 +37,7 @@ public class MemberService {
 
         // 이런 식으로 작성해도 된다.
         findByUsername(username).ifPresent(ignored -> {
-            throw new GlobalException("400-1", "이미 존재하는 아이디야");
+            throw new GlobalException("401-1", "이미 존재하는 아이디야");
         });
 
         Member member = Member.builder()

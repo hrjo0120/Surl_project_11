@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +27,7 @@ public class SurlController {
 
     @GetMapping("/add")
     @ResponseBody
+    @Transactional
     public RsData<Surl> add(String body, String url) {
         Member member = rq.getMember(); // 현재 브라우저로 로그인 한 회원 정보
 
@@ -34,6 +36,7 @@ public class SurlController {
 
     @GetMapping("/s/{body}/**")
     @ResponseBody
+    @Transactional
     public RsData<Surl> add(
             @PathVariable String body,  //@PathVariable : 경로를 받아오는 어노테이션 , URL 경로에서 변수 없을 추출하여 매개 변수에 할당.
             HttpServletRequest req
@@ -55,6 +58,7 @@ public class SurlController {
     }
 
     @GetMapping("/g/{id}")
+    @Transactional
     public String go(
             @PathVariable long id
     ) {

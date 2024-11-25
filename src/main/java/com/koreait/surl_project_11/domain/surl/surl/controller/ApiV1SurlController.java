@@ -121,6 +121,9 @@ public class ApiV1SurlController {
     ) {
         Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
 
+        rq.getMember(); // member 로딩
+        rq.getMember(); // 빠르게 했으면 좋겠어
+
         authService.checkCanDeleteSurl(rq.getMember(), surl);
 
         surlService.delete(surl);

@@ -1,5 +1,6 @@
 package com.koreait.surl_project_11.domain.surl.surl.controller;
 
+import com.koreait.surl_project_11.domain.auth.auth.service.AuthService;
 import com.koreait.surl_project_11.domain.member.member.entity.Member;
 import com.koreait.surl_project_11.domain.surl.surl.dto.SurlDto;
 import com.koreait.surl_project_11.domain.surl.surl.entity.Surl;
@@ -28,6 +29,7 @@ public class ApiV1SurlController {
 
     private final Rq rq;
     private final SurlService surlService;
+    private final AuthService authService;
 
     @AllArgsConstructor
     @Getter
@@ -76,11 +78,7 @@ public class ApiV1SurlController {
     ) {
         Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
 
-        Member member = rq.getMember();
-
-        if (!surl.getAuthor().equals(member)) {
-            throw new GlobalException("403-1", "권한이 없어");
-        }
+        authService.checkCanGetSurl(rq.getMember(), surl);
 
         return RsData.of(
                 new SurlGetRespBody(
@@ -120,11 +118,7 @@ public class ApiV1SurlController {
     ) {
         Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
 
-        Member member = rq.getMember();
-
-        if (!surl.getAuthor().equals(member)) {
-            throw new GlobalException("403-1", "권한이 없어");
-        }
+        authService.checkCanDeleteSurl(rq.getMember(), surl);
 
         surlService.delete(surl);
         return RsData.OK;
@@ -153,12 +147,7 @@ public class ApiV1SurlController {
     ) {
         Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
 
-        Member member = rq.getMember();
-
-        if (!surl.getAuthor().equals(member)) {     // 객체 비교는 equals 사용해야함. id의 타입이 Long 이고, Long은 기본타입이 아니기 때문에 equals를 사용해야함(참조타입)
-//        if (surl.getAuthor().getId() != member.getId()) {     // 이건 단순 값비교할때 사용
-            throw new GlobalException("403-1", "권한이 없어");
-        }
+        authService.checkCanModifySurl(rq.getMember(), surl);
 
         RsData<Surl> modifyRs = surlService.modify(surl, reqBody.body, reqBody.url);
 

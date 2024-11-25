@@ -80,7 +80,7 @@ public class ApiV1SurlController {
     ) {
         Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
 
-        authService.checkCanGetSurl(rq.getMember(), surl);
+        authService.checkCanGetSurl(rq.getMember(), surl);  // (rq.getMember() 얘 때문에 단건조회 했을때 뜨지 않음. why? 채워줘야하는데 채워주지 않아서 현 상태는 null 이기 때문이다. 기본 값으로 null 을 가지고 있다.
 
         return RsData.of(
                 new SurlGetRespBody(
@@ -96,12 +96,7 @@ public class ApiV1SurlController {
     }
 
     @GetMapping("")
-    public RsData<SurlGetItemsRespBody> getItems(
-            String actorUsername
-    ) {
-        Member logindMember = memberService.findByUsername(actorUsername).orElseThrow(GlobalException.E404::new);
-
-        rq.setMember(logindMember);
+    public RsData<SurlGetItemsRespBody> getItems() {
 
         Member member = rq.getMember();
 

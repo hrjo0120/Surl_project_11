@@ -53,9 +53,8 @@ public class Rq {
         if (Ut.str.isBlank(actorPassword)) throw new GlobalException("401-2", "인증정보(비밀번호)를 입력해주세요");
 
         Member loginedMember = memberService.findByUsername(actorUsername).orElseThrow(() -> new GlobalException("403-3", "해당 회원은 없습니다"));
-        if (!loginedMember.getPassword().equals(actorPassword)) throw new GlobalException("403-4", "비밀번호가 틀립니다");
-
-        member = loginedMember;
+        if (!memberService.matchPassword(actorPassword, loginedMember.getPassword()))
+            throw new GlobalException("403-4", "비밀번호가 틀립니다");
 
         return loginedMember;
     }

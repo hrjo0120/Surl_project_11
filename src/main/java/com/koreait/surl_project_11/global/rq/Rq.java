@@ -2,12 +2,11 @@ package com.koreait.surl_project_11.global.rq;
 
 import com.koreait.surl_project_11.domain.member.member.entity.Member;
 import com.koreait.surl_project_11.domain.member.member.service.MemberService;
-import com.koreait.surl_project_11.global.exceptions.GlobalException;
-import com.koreait.surl_project_11.standard.util.Ut;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -26,27 +25,11 @@ public class Rq {
     public Member getMember() {
         if (member != null) return member;   // 캐시 데이터 방식, 메모리 캐싱
 
-        String actorUsername = getCookieValue("actorUsername", null);
-        String actorPassword = getCookieValue("actorPassword", null);
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        if (actorUsername == null || actorPassword == null) {
-            String authorization = req.getHeader("Authorization");
-            if (authorization != null) {
-                authorization = authorization.substring("bearer ".length());
-                String[] authorizationBits = authorization.split(" ", 2);
-                actorUsername = authorizationBits[0];
-                actorPassword = authorizationBits.length == 2 ? authorizationBits[1] : null;
-            }
-        }
+        member = memberService.findByUsername(name).get();
 
-        if (Ut.str.isBlank(actorUsername)) throw new GlobalException("401-1", "인증정보(아이디)를 입력해주세요");
-        if (Ut.str.isBlank(actorPassword)) throw new GlobalException("401-2", "인증정보(비밀번호)를 입력해주세요");
-
-        Member loginedMember = memberService.findByUsername(actorUsername).orElseThrow(() -> new GlobalException("403-3", "해당 회원은 없습니다"));
-        if (!memberService.matchPassword(actorPassword, loginedMember.getPassword()))
-            throw new GlobalException("403-4", "비밀번호가 틀립니다");
-
-        return loginedMember;
+        return member;
     }
 
 

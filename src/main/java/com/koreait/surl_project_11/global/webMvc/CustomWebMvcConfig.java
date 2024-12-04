@@ -13,7 +13,7 @@ public class CustomWebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(
                         // "https://cdpn.io",  // 코드펜 테스트용
-                        AppConfig.getSiteFrontUrl()
+                        AppConfig.getSiteFrontUrl() // http://localhost:5173 or https://www.surl.abbl.site
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*")
